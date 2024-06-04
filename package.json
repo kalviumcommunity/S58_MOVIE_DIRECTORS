@@ -1,0 +1,11 @@
+{
+  "name": "s58_movie_directors",
+  "version": "1.0.0",
+  "description": "# List of all the Movie Directors # directors",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
