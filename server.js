@@ -1,31 +1,43 @@
-const express = require('express')
-const { startDatabase, stopDatabase, isConnected } = require('./db')
-const app = express()
+const express = require("express");
+const { startDatabase, stopDatabase, isConnected } = require("./db");
+const app = express();
 
-const port = process.env.PUBLIC_PORT || 8000
+const port = process.env.PUBLIC_PORT || 8000;
 
-app.get('/', (req, res) => {
-	res.json({
-		database: isConnected() ? 'connected' : 'disconnected'
-	})
-})
+app.get("/", (req, res) => {
+  res.json({
+    database: isConnected() ? "connected" : "disconnected",
+  });
+});
 
-process.on('SIGINT', async () => {
-	await stopDatabase()
-	process.exit(0)
-})
+app.post("/post", (req, res) => {
+  res.json("connected");
+});
 
-process.on('SIGTERM', async () => {
-	await stopDatabase()
-	process.exit(0)
-})
+app.put("/put", (req, res) => {
+  res.json("put connected");
+});
+
+app.delete("/delete", (req, res) => {
+  res.json("deleted");
+});
+
+process.on("SIGINT", async () => {
+  await stopDatabase();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await stopDatabase();
+  process.exit(0);
+});
 
 if (require.main === module) {
-	app.listen(port, async () => {
-		await startDatabase()
+  app.listen(port, async () => {
+    await startDatabase();
 
-		console.log(`🚀 Server running on PORT: ${port}`)
-	})
+    console.log(`🚀 Server running on PORT: ${port}`);
+  });
 }
 
-module.exports = app
+module.exports = app;
