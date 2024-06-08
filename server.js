@@ -1,13 +1,31 @@
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
-app.use(express.json());
+const express = require('express')
+const { startDatabase, stopDatabase, isConnected } = require('./db')
+const app = express()
 
-app.get('/ping', (req, res) => {
-  res.send('Pong!');
-});
+const port = process.env.PUBLIC_PORT || 8000
 
+app.get('/', (req, res) => {
+	res.json({
+		database: isConnected() ? 'connected' : 'disconnected'
+	})
+})
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+process.on('SIGINT', async () => {
+	await stopDatabase()
+	process.exit(0)
+})
+
+process.on('SIGTERM', async () => {
+	await stopDatabase()
+	process.exit(0)
+})
+
+if (require.main === module) {
+	app.listen(port, async () => {
+		await startDatabase()
+
+		console.log(`🚀 Server running on PORT: ${port}`)
+	})
+}
+
+module.exports = app
