@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+  background-color: #f3f7ec;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h2 {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+h2,
+h4,
+p {
+  margin-bottom: 10px;
+}
+
+.box {
+  box-shadow: 2px 2px 5px rgba(0, 92, 120, 0.7);
+  border-radius: 20px;
+  padding: 20px;
+}
