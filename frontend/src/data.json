@@ -1,0 +1,13 @@
+{
+  "directors": [
+    {
+      "name": "Sanjay Leela Bhansali",
+      "date_of_birth": "Feb 24, 1963",
+      "nationality": "Indian",
+      "active_years": "1996–present",
+      "notable_films": ["Devdas", "Padmaavat", "Mary Kom"],
+      "awards": ["National Film Awards", "Filmfare Awards"],
+      "genre_specialization": ["Romance", "Drama"]
+    }
+  ]
+}
