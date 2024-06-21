@@ -1,28 +1,26 @@
-const mongoose = require('mongoose')
-const { MongoMemoryServer } = require('mongodb-memory-server')
-
-let mongoServer
+const mongoose = require("mongoose");
+const config = require("./config");
 
 const startDatabase = async () => {
-	mongoServer = await MongoMemoryServer.create()
-	const mongoUri = mongoServer.getUri()
-
-	await mongoose.connect(mongoUri, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true
-	})
-
-	console.log('📦 Connected to MongoDB')
-}
+  try {
+    await mongoose.connect(config.mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("📦 Connected to MongoDB");
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error.message);
+    process.exit(1);
+  }
+};
 
 const stopDatabase = async () => {
-	await mongoose.disconnect()
-	await mongoServer.stop()
-	console.log('📦 Disconnected from MongoDB')
-}
+  await mongoose.disconnect();
+  console.log("📦 Disconnected from MongoDB");
+};
 
 const isConnected = () => {
-	return mongoose.connection.readyState === 1
-}
+  return mongoose.connection.readyState === 1;
+};
 
-module.exports = { startDatabase, stopDatabase, isConnected }
+module.exports = { startDatabase, stopDatabase, isConnected };

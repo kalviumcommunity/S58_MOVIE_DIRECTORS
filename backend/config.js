@@ -1,6 +1,6 @@
 const config = {
-	mongoURI:
-		'mongodb+srv://KALVIUM_ASAP:ADITI123@kalvium.fmgzr6m.mongodb.net/?retryWrites=true&w=majority&appName=kalvium'
-}
+  mongoURI:
+    "mongodb+srv://KALVIUM_ASAP:ADITI123@kalvium.fmgzr6m.mongodb.net/test",
+};
 
-module.exports = config
+module.exports = config;
