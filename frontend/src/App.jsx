@@ -1,42 +1,27 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import DirectorsList from "./Components/Directors";
+import CreateData from "./Components/CreateData";
+import Update from "./Components/Update";
+import Login from "./Components/Login";
+import Logout from "./Components/Logout";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const DirectorsList = () => {
-  const [directors, setDirectors] = useState([]);
-
-  useEffect(() => {
-    const fetchDirectors = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/data");
-        setDirectors(response.data);
-      } catch (error) {
-        console.error("Error fetching directors:", error);
-      }
-    };
-
-    fetchDirectors();
-  }, []);
-
+function App() {
   return (
     <div>
-      <h1>Directors List</h1>
-      <ul>
-        {directors.map((director) => (
-          <li key={director._id}>
-            <h2>{director.name}</h2>
-            <p>Date of Birth: {director.date_of_birth}</p>
-            <p>Nationality: {director.nationality}</p>
-            <p>Active Years: {director.active_years}</p>
-            <p>Notable Films: {director.notable_films.join(", ")}</p>
-            <p>Awards: {director.awards.join(", ")}</p>
-            <p>
-              Genre Specialization: {director.genre_specialization.join(",")}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<DirectorsList />} />
+          <Route path="/create" element={<CreateData />} />
+          <Route path="/update/:id" element={<Update />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Logout />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
-};
+}
 
-export default DirectorsList;
+export default App;
