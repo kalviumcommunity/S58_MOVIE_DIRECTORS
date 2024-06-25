@@ -8,28 +8,40 @@ const UserModel = require("./User");
 const app = express();
 const port = process.env.PUBLIC_PORT || 8000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
 
 app.post("/login", async (req, res) => {
-  const { username } = req.body;
+  const { username, password } = req.body;
 
   try {
-    if (!username) {
-      return res.status(400).send("Username is required");
+    if (!username || !password) {
+      return res.status(400).send("Username and password are required");
     }
 
     let user = await UserModel.findOne({ username });
 
     if (!user) {
-      user = await UserModel.create({ username });
+      user = await UserModel.create({ username, password });
       console.log(`New user created: ${username}`);
+    } else {
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+        return res.status(400).send("Invalid credentials");
+      }
     }
 
     res.cookie("username", username, {
       maxAge: 365 * 24 * 60 * 60 * 1000,
       httpOnly: true,
+      sameSite: "strict", // Add this to prevent CSRF attacks
     });
 
     res.status(200).send(`Logged in as ${username}`);
@@ -39,9 +51,33 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/logout", (req, res) => {
-  res.clearCookie("username");
-  res.status(200).send("Logged out successfully");
+app.delete("/logout", async (req, res) => {
+  try {
+    console.log("Cookies received: ", req.cookies); // Log all cookies received
+
+    const { username } = req.cookies;
+
+    if (!username) {
+      console.log("No username cookie found");
+      return res.status(400).json({ error: "No username cookie found" });
+    }
+
+    console.log("Username from cookie: ", username);
+    const user = await UserModel.findOneAndDelete({ username });
+
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.clearCookie("username");
+    console.log("User deleted and cookie cleared");
+
+    res.status(200).send("Logged out and user deleted successfully");
+  } catch (error) {
+    console.error("Error logging out:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.get("/data", async (req, res) => {
