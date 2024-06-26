@@ -1,9 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const { startDatabase, stopDatabase, isConnected } = require("./db");
 const DirectorModel = require("./director");
 const UserModel = require("./User");
+const { generateAccessToken, authenticateToken } = require("./auth");
+const config = require("./config");
 
 const app = express();
 const port = process.env.PUBLIC_PORT || 8000;
@@ -38,10 +41,13 @@ app.post("/login", async (req, res) => {
       }
     }
 
-    res.cookie("username", username, {
-      maxAge: 365 * 24 * 60 * 60 * 1000,
+    const accessToken = generateAccessToken(user);
+
+    res.cookie("access_token", accessToken, {
+      maxAge: config.accessTokenExpiry,
       httpOnly: true,
-      sameSite: "strict", // Add this to prevent CSRF attacks
+      secure: true, // Set to true in production
+      sameSite: "strict", // Adjust based on your requirements
     });
 
     res.status(200).send(`Logged in as ${username}`);
@@ -55,14 +61,31 @@ app.delete("/logout", async (req, res) => {
   try {
     console.log("Cookies received: ", req.cookies); // Log all cookies received
 
-    const { username } = req.cookies;
+    const { access_token } = req.cookies;
 
-    if (!username) {
-      console.log("No username cookie found");
-      return res.status(400).json({ error: "No username cookie found" });
+    if (!access_token) {
+      console.log("No access_token cookie found");
+      return res.status(400).json({ error: "No access_token cookie found" });
     }
 
-    console.log("Username from cookie: ", username);
+    console.log("Access token found");
+
+    // Clear access_token cookie
+    res.clearCookie("access_token");
+    console.log("Access token cookie cleared");
+
+    // Retrieve username from token and delete user
+    const decodedToken = jwt.decode(access_token);
+    const { username } = decodedToken;
+
+    if (!username) {
+      console.log("No username found in token");
+      return res.status(400).json({ error: "No username found in token" });
+    }
+
+    console.log("Username from token: ", username);
+
+    // Assuming UserModel is defined and handles user deletion
     const user = await UserModel.findOneAndDelete({ username });
 
     if (!user) {
@@ -70,8 +93,7 @@ app.delete("/logout", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.clearCookie("username");
-    console.log("User deleted and cookie cleared");
+    console.log("User deleted successfully");
 
     res.status(200).send("Logged out and user deleted successfully");
   } catch (error) {
@@ -80,7 +102,7 @@ app.delete("/logout", async (req, res) => {
   }
 });
 
-app.get("/data", async (req, res) => {
+app.get("/data", authenticateToken, async (req, res) => {
   try {
     if (!isConnected()) {
       throw new Error("Database is not connected");
@@ -141,7 +163,7 @@ app.delete("/deleteUser/:id", async (req, res) => {
   }
 });
 
-app.post("/createData", async (req, res) => {
+app.post("/createData", authenticateToken, async (req, res) => {
   try {
     console.log("Request body:", req.body); // Log request body for debugging
     const { error } = DirectorModel.schema.methods.joiValidate(req.body);
