@@ -39,7 +39,6 @@ const directorJoiSchema = Joi.object({
   genre: Joi.array().items(Joi.string().min(2).max(50)).required(),
 });
 
-// Method to validate a director object using Joi
 directorSchema.methods.joiValidate = function (obj) {
   return directorJoiSchema.validate(obj, { abortEarly: false });
 };
