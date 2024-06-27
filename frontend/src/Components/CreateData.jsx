@@ -4,7 +4,6 @@ import Joi from "joi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 
-// Define the Joi validation schema with custom messages
 const directorJoiSchema = Joi.object({
   name: Joi.string().min(2).max(20).required().messages({
     "string.empty": "Name is required",
@@ -99,20 +98,27 @@ function CreateData() {
     try {
       const result = await axios.post(
         "http://localhost:8000/createData",
-        payload
+        payload,
+        { withCredentials: true }
       );
       console.log(result);
       navigate("/");
     } catch (error) {
-      console.log(error);
+      if (error.response && error.response.status === 401) {
+        console.log("Unauthorized access:", error.response.data.message);
+      } else {
+        console.error("Error creating data:", error);
+      }
     }
   };
 
   return (
-    <div className="d-flex vh-100 bg-primary justify-content-center align-items-center">
-      <div className="w-50 bg-white rounded p-3 shadow ">
+    <div className="d-flex vh-100 bg-light justify-content-center align-items-center">
+      <div className="w-50 bg-white rounded p-4 shadow-sm">
         <form onSubmit={handleSubmit}>
-          <h2>Add User</h2>
+          <h2 className="text-center mb-4" style={{ color: "#6c757d" }}>
+            Add Director
+          </h2>
           <div className="mb-3">
             <label htmlFor="name" className="form-label">
               Name
@@ -127,7 +133,7 @@ function CreateData() {
               onChange={handleInputChange}
               required
             />
-            {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+            {errors.name && <p className="text-danger">{errors.name}</p>}
           </div>
           <div className="mb-3">
             <label htmlFor="date_of_birth" className="form-label">
@@ -144,7 +150,7 @@ function CreateData() {
               required
             />
             {errors.date_of_birth && (
-              <p style={{ color: "red" }}>{errors.date_of_birth}</p>
+              <p className="text-danger">{errors.date_of_birth}</p>
             )}
           </div>
           <div className="mb-3">
@@ -162,7 +168,7 @@ function CreateData() {
               required
             />
             {errors.nationality && (
-              <p style={{ color: "red" }}>{errors.nationality}</p>
+              <p className="text-danger">{errors.nationality}</p>
             )}
           </div>
           <div className="mb-3">
@@ -180,7 +186,7 @@ function CreateData() {
               required
             />
             {errors.active_years && (
-              <p style={{ color: "red" }}>{errors.active_years}</p>
+              <p className="text-danger">{errors.active_years}</p>
             )}
           </div>
           <div className="mb-3">
@@ -191,13 +197,13 @@ function CreateData() {
               type="text"
               id="awards"
               name="awards"
-              placeholder="Enter Awards "
+              placeholder="Enter Awards (comma-separated)"
               className="form-control"
               value={formData.awards}
               onChange={handleInputChange}
               required
             />
-            {errors.awards && <p style={{ color: "red" }}>{errors.awards}</p>}
+            {errors.awards && <p className="text-danger">{errors.awards}</p>}
           </div>
           <div className="mb-3">
             <label htmlFor="genre" className="form-label">
@@ -207,15 +213,15 @@ function CreateData() {
               type="text"
               id="genre"
               name="genre"
-              placeholder="Enter Genre"
+              placeholder="Enter Genre (comma-separated)"
               className="form-control"
               value={formData.genre}
               onChange={handleInputChange}
               required
             />
-            {errors.genre && <p style={{ color: "red" }}>{errors.genre}</p>}
+            {errors.genre && <p className="text-danger">{errors.genre}</p>}
           </div>
-          <button className="btn btn-primary">Submit</button>
+          <button className="btn btn-primary w-100">Submit</button>
         </form>
       </div>
     </div>
