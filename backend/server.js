@@ -46,11 +46,17 @@ app.post("/login", async (req, res) => {
     res.cookie("access_token", accessToken, {
       maxAge: config.accessTokenExpiry,
       httpOnly: true,
-      secure: true, // Set to true in production
-      sameSite: "strict", // Adjust based on your requirements
+      secure: true,
+      sameSite: "strict",
     });
 
-    res.status(200).send(`Logged in as ${username}`);
+    res.status(200).json({
+      message: `Logged in as ${username}`,
+      user: {
+        username: user.username,
+        _id: user._id,
+      },
+    });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).send("Internal Server Error");
@@ -59,7 +65,7 @@ app.post("/login", async (req, res) => {
 
 app.delete("/logout", async (req, res) => {
   try {
-    console.log("Cookies received: ", req.cookies); // Log all cookies received
+    console.log("Cookies received: ", req.cookies);
 
     const { access_token } = req.cookies;
 
@@ -70,11 +76,9 @@ app.delete("/logout", async (req, res) => {
 
     console.log("Access token found");
 
-    // Clear access_token cookie
     res.clearCookie("access_token");
     console.log("Access token cookie cleared");
 
-    // Retrieve username from token and delete user
     const decodedToken = jwt.decode(access_token);
     const { username } = decodedToken;
 
@@ -85,7 +89,6 @@ app.delete("/logout", async (req, res) => {
 
     console.log("Username from token: ", username);
 
-    // Assuming UserModel is defined and handles user deletion
     const user = await UserModel.findOneAndDelete({ username });
 
     if (!user) {
@@ -165,20 +168,21 @@ app.delete("/deleteUser/:id", async (req, res) => {
 
 app.post("/createData", authenticateToken, async (req, res) => {
   try {
-    console.log("Request body:", req.body); // Log request body for debugging
+    console.log("Request body:", req.body);
     const { error } = DirectorModel.schema.methods.joiValidate(req.body);
     if (error) {
-      console.error("Validation error:", error.details); // Log validation error details
+      console.error("Validation error:", error.details);
       return res.status(400).json({
         success: false,
         message: error.details.map((detail) => detail.message),
       });
     }
 
-    const user = await DirectorModel.create(req.body);
-    res.json({ success: true, user });
+    const directorData = { ...req.body, created_by: req.user._id };
+    const director = await DirectorModel.create(directorData);
+    res.json({ success: true, director });
   } catch (error) {
-    console.error("Error creating user:", error); // Log any other errors
+    console.error("Error creating director:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
