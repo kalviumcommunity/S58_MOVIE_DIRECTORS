@@ -47,83 +47,99 @@ function Update() {
   };
 
   return (
-    <div className="d-flex vh-100 bg-primary justify-content-center align-items-center">
-      <div className="w-50 bg-white rounded p-3 shadow">
+    <div className="d-flex vh-100 bg-light justify-content-center align-items-center">
+      <div className="w-50 bg-white rounded p-4 shadow-sm">
         <form onSubmit={Update}>
-          <h2>Update</h2>
+          <h2 className="text-center mb-4" style={{ color: "#6c757d" }}>
+            Update Director
+          </h2>
           <div className="mb-3">
-            <label htmlFor="" className="form-label">
+            <label htmlFor="name" className="form-label">
               Name
             </label>
             <input
               type="text"
+              id="name"
               placeholder="Enter Name"
               className="form-control"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="" className="form-label">
-              DateOfBirth
+            <label htmlFor="date_of_birth" className="form-label">
+              Date of Birth
             </label>
             <input
               type="date"
-              placeholder="Enter Birth Day"
+              id="date_of_birth"
+              placeholder="Enter Birth Date"
               className="form-control"
               value={date_of_birth}
               onChange={(e) => setDate_Of_Birth(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="" className="form-label">
+            <label htmlFor="nationality" className="form-label">
               Nationality
             </label>
             <input
               type="text"
+              id="nationality"
               placeholder="Enter Nationality"
               className="form-control"
               value={nationality}
               onChange={(e) => setNationality(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="" className="form-label">
-              ActiveYears
+            <label htmlFor="active_years" className="form-label">
+              Active Years
             </label>
             <input
               type="number"
+              id="active_years"
               placeholder="Enter Active Years"
               className="form-control"
               value={active_years}
               onChange={(e) => setActive_Years(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="" className="form-label">
+            <label htmlFor="awards" className="form-label">
               Awards
             </label>
             <input
               type="text"
-              placeholder="Enter Awards"
+              id="awards"
+              placeholder="Enter Awards (comma-separated)"
               className="form-control"
               value={awards}
               onChange={(e) => setAwards(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="" className="form-label">
+            <label htmlFor="genre" className="form-label">
               Genre
             </label>
             <input
               type="text"
-              placeholder="Enter Genre"
+              id="genre"
+              placeholder="Enter Genre (comma-separated)"
               className="form-control"
               value={genre}
               onChange={(e) => setGenre(e.target.value)}
+              required
             />
           </div>
-          <button className="btn btn-primary">Update</button>
+          <button type="submit" className="btn btn-primary w-100">
+            Update
+          </button>
         </form>
       </div>
     </div>
