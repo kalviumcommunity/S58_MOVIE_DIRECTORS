@@ -3,14 +3,29 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [message, setMessage] = useState();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@#$]).{8,}$/;
+    return passwordRegex.test(password);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!validatePassword(password)) {
+      setMessage(
+        "Password must be at least 8 characters long, include at least one letter, one number, and one special character (@, #, $)."
+      );
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await axios.post(
@@ -31,9 +46,11 @@ function Login() {
     } catch (error) {
       console.error(
         "Login error:",
-        error.reponse?.data?.message || error.message
+        error.response?.data?.message || error.message
       );
       setMessage("Login failed. Please try again");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,7 +75,7 @@ function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              disabled={isLoggedIn}
+              disabled={isLoggedIn || loading}
             />
           </div>
           <div className="mb-3">
@@ -72,16 +89,16 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={isLoggedIn}
+              disabled={isLoggedIn || loading}
             />
           </div>
           <div>
             <button
               type="submit"
               className="btn btn-primary w-100"
-              disabled={isLoggedIn}
+              disabled={isLoggedIn || loading}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
           </div>
         </form>

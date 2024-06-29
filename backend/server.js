@@ -7,6 +7,7 @@ const DirectorModel = require("./director");
 const UserModel = require("./User");
 const { generateAccessToken, authenticateToken } = require("./auth");
 const config = require("./config");
+const Joi = require("joi");
 
 const app = express();
 const port = process.env.PUBLIC_PORT || 8000;
@@ -32,6 +33,10 @@ app.post("/login", async (req, res) => {
     let user = await UserModel.findOne({ username });
 
     if (!user) {
+      const { error } = UserModel.validate({ username, password });
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
       user = await UserModel.create({ username, password });
       console.log(`New user created: ${username}`);
     } else {
