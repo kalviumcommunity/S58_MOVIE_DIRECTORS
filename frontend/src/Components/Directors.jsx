@@ -97,6 +97,7 @@ const DirectorsList = () => {
           onChange={handleSearchInputChange}
         />
       </div>
+      <div className="mb-4"></div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="mb-0" style={{ color: "#6c757d" }}>
           Directors List
