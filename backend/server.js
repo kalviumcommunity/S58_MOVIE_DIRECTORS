@@ -68,7 +68,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.delete("/logout", async (req, res) => {
+app.delete("/logout", authenticateToken, async (req, res) => {
   try {
     console.log("Cookies received: ", req.cookies);
 
@@ -187,8 +187,17 @@ app.post("/createData", authenticateToken, async (req, res) => {
     const director = await DirectorModel.create(directorData);
     res.json({ success: true, director });
   } catch (error) {
-    console.error("Error creating director:", error);
+    console.error("Error creating director:", error); // Log the error
     res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.get("/users", async (req, res) => {
+  try {
+    const users = await UserModel.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

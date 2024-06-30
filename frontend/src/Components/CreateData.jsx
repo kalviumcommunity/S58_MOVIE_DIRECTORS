@@ -39,8 +39,8 @@ function CreateData() {
     date_of_birth: "",
     nationality: "",
     active_years: "",
-    awards: "",
-    genre: "",
+    awards: [],
+    genre: [],
   });
 
   const [errors, setErrors] = useState({});
