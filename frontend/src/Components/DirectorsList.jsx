@@ -35,6 +35,7 @@ const DirectorsList = () => {
         console.error("Error fetching users:", error);
       }
     };
+
     fetchDirectors();
     fetchUsers();
   }, []);
@@ -97,7 +98,21 @@ const DirectorsList = () => {
           onChange={handleSearchInputChange}
         />
       </div>
-      <div className="mb-4"></div>
+      <div className="mb-4">
+        <select
+          id="userDropdown"
+          className="form-control"
+          value={selectedUser}
+          onChange={handleUserChange}
+        >
+          <option value="">All Users</option>
+          {users.map((user) => (
+            <option key={user._id} value={user._id}>
+              {user.username}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="mb-0" style={{ color: "#6c757d" }}>
           Directors List

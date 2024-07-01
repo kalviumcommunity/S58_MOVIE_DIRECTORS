@@ -27,9 +27,13 @@ const directorSchema = new Schema({
     type: [String],
     required: true,
   },
+  created_by: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
-// Define the Joi validation schema
 const directorJoiSchema = Joi.object({
   name: Joi.string().min(2).max(20).required(),
   date_of_birth: Joi.date().required(),
@@ -37,12 +41,13 @@ const directorJoiSchema = Joi.object({
   active_years: Joi.number().integer().required(),
   awards: Joi.array().items(Joi.string().min(2).max(50)).required(),
   genre: Joi.array().items(Joi.string().min(2).max(50)).required(),
+  created_by: Joi.string().required(),
 });
 
 directorSchema.methods.joiValidate = function (obj) {
   return directorJoiSchema.validate(obj, { abortEarly: false });
 };
 
-const DirectorModel = mongoose.model("directors", directorSchema);
+const DirectorModel = mongoose.model("Director", directorSchema);
 
 module.exports = DirectorModel;
