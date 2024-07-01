@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import DirectorsList from "./Components/Directors";
+import DirectorsList from "./Components/DirectorsList";
 import CreateData from "./Components/CreateData";
 import Update from "./Components/Update";
 import "bootstrap/dist/css/bootstrap.min.css";

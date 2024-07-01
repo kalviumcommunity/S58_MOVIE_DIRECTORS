@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Joi from "joi";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -31,6 +31,7 @@ const directorJoiSchema = Joi.object({
     "string.min": "Each genre should have at least 2 characters",
     "string.max": "Each genre should have at most 50 characters",
   }),
+  created_by: Joi.string().required(),
 });
 
 function CreateData() {
@@ -41,10 +42,27 @@ function CreateData() {
     active_years: "",
     awards: [],
     genre: [],
+    created_by: "", // Initialize created_by field
   });
 
+  const [users, setUsers] = useState([]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/users", {
+          withCredentials: true,
+        });
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,6 +112,8 @@ function CreateData() {
       awards: awardsArray,
       genre: genreArray,
     };
+
+    console.log("Payload before sending:", payload); // Verify payload
 
     try {
       const result = await axios.post(
@@ -220,6 +240,29 @@ function CreateData() {
               required
             />
             {errors.genre && <p className="text-danger">{errors.genre}</p>}
+          </div>
+          <div className="mb-3">
+            <label htmlFor="created_by" className="form-label">
+              Created By
+            </label>
+            <select
+              id="created_by"
+              name="created_by"
+              className="form-control"
+              value={formData.created_by}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select User</option>
+              {users.map((user) => (
+                <option key={user._id} value={user._id}>
+                  {user.username}
+                </option>
+              ))}
+            </select>
+            {errors.created_by && (
+              <p className="text-danger">{errors.created_by}</p>
+            )}
           </div>
           <button className="btn btn-primary w-100">Submit</button>
         </form>

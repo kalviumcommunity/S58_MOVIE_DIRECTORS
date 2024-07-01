@@ -68,7 +68,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.delete("/logout", authenticateToken, async (req, res) => {
+app.delete("/logout", authenticateToken, (req, res) => {
   try {
     console.log("Cookies received: ", req.cookies);
 
@@ -94,16 +94,9 @@ app.delete("/logout", authenticateToken, async (req, res) => {
 
     console.log("Username from token: ", username);
 
-    const user = await UserModel.findOneAndDelete({ username });
+    console.log("User logged out successfully");
 
-    if (!user) {
-      console.log("User not found");
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    console.log("User deleted successfully");
-
-    res.status(200).send("Logged out and user deleted successfully");
+    res.status(200).send("Logged out successfully");
   } catch (error) {
     console.error("Error logging out:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -173,7 +166,7 @@ app.delete("/deleteUser/:id", async (req, res) => {
 
 app.post("/createData", authenticateToken, async (req, res) => {
   try {
-    console.log("Request body:", req.body);
+    console.log("Request body:", req.body); // Log the request body
     const { error } = DirectorModel.schema.methods.joiValidate(req.body);
     if (error) {
       console.error("Validation error:", error.details);
@@ -183,11 +176,13 @@ app.post("/createData", authenticateToken, async (req, res) => {
       });
     }
 
-    const directorData = { ...req.body, created_by: req.user._id };
-    const director = await DirectorModel.create(directorData);
+    const director = new DirectorModel(req.body);
+    console.log("Director to be saved:", director);
+    await director.save();
+
     res.json({ success: true, director });
   } catch (error) {
-    console.error("Error creating director:", error); // Log the error
+    console.error("Error creating director:", error.stack); // Log the error stack
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -196,6 +191,17 @@ app.get("/users", async (req, res) => {
   try {
     const users = await UserModel.find();
     res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/directors", async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const query = userId ? { created_by: userId } : {};
+    const directors = await DirectorModel.find(query);
+    res.json(directors);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
